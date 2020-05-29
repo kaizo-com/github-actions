@@ -1,0 +1,39 @@
+name: 'Hello World'
+description: 'Greet someone and record the time'
+inputs:
+  service-name:
+    description: 'The name of the microservice to deploy. Used to name the resulting K8s resources.'
+    required: true
+  target-env:
+    description: 'The target environment in K8s to deploy to.'
+    required: true
+  revision:
+    description: 'The short git SHA identifying the build revision.'
+    required: true
+  image:
+    description: 'the full name and tag of the docker image to be used.'
+    required: true
+  gcp_project_id:
+    description: 'The Id of the GCP project we want to deploy to.'
+    required: true
+  gcp_cluster_name:
+    description: 'The name of the GKE K8s cluster we want to deploy to.'
+    required: true
+  gcp_zone:
+    description: 'The GCP zone the cluster is running int.'
+    required: true
+  gcp_service_account_key:
+    description: 'The base64 encoded GCP service account key (should be set from a Github Actions secret!).'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.service-name }}
+    - ${{ inputs.target-env }}
+    - ${{ inputs.revision }}
+    - ${{ inputs.image }}
+    - ${{ inputs.gcp_project_id }}
+    - ${{ inputs.gcp_cluster_name }}
+    - ${{ inputs.gcp_zone }}
+    - ${{ inputs.gcp_service_account_key }}
