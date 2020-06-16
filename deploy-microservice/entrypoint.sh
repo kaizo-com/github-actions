@@ -76,7 +76,7 @@ kustomize edit add resource base/deployment-base.yaml
 kustomize edit add resource base/service-base.yaml
 
 echo "Adding build info kustomizations..."
-kustomize edit add annotation gitRev:$REVISION
+kustomize edit add annotation version:git-$REVISION
 kustomize edit set image $SERVICE_NAME=$IMAGE
 
 echo "Adding project-specific patches..."
