@@ -65,7 +65,8 @@ kubectl get namespace ${TARGET_ENV} -o yaml | sed 's/^/  /'
 echo ""
 echo "Initializing kustomizations..."
 cd $KUSTOMIZE_DIR
-touch kustomization.yaml
+KUSTOMIZE_FILE_NAME="kustomization-${TARGET_ENV}.yaml"
+touch ${KUSTOMIZE_FILE_NAME}
 kustomize edit set namespace $TARGET_ENV
 
 echo "Generating kustomization base resources..."
@@ -81,7 +82,7 @@ kustomize edit set image $SERVICE_NAME=$IMAGE
 
 echo "Adding project-specific patches..."
 for patch in *.yaml; do
-  if [ "$patch" != "kustomization.yaml" ]; then
+  if [ "$patch" != "${KUSTOMIZE_FILE_NAME}" ]; then
     echo "  Adding patch '${patch}'..."
     kustomize edit add patch ${patch}
   fi
@@ -94,8 +95,8 @@ if [ -d $TARGET_ENV ]; then
   done
 fi
 
-echo "Contents of kustomization.yaml:"
-cat kustomization.yaml | sed 's/^/  /'
+echo "Contents of ${KUSTOMIZE_FILE_NAME}:"
+cat ${KUSTOMIZE_FILE_NAME} | sed 's/^/  /'
 
 echo ""
 echo "Kustomizing resources..."
