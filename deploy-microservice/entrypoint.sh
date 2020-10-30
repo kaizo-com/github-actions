@@ -100,18 +100,18 @@ cat ${KUSTOMIZE_FILE_NAME} | sed 's/^/  /'
 
 echo ""
 echo "Kustomizing resources..."
-kustomize build . > kustomized.yaml
-cat kustomized.yaml | sed 's/^/  /'
+kustomize build . > ${KUSTOMIZE_FILE_NAME}
+cat ${KUSTOMIZE_FILE_NAME} | sed 's/^/  /'
 
 echo ""
 echo "Deploying to ${TARGET_ENV}..."
-kubectl --namespace $TARGET_ENV apply -f kustomized.yaml --record
+kubectl --namespace $TARGET_ENV apply -f ${KUSTOMIZE_FILE_NAME} --record
 kubectl --namespace $TARGET_ENV rollout status deployment.v1.apps/${SERVICE_NAME}-deployment
 
 echo ""
 echo "Updated Resources:"
 echo "=========================================================="
-kubectl --namespace $TARGET_ENV describe -f kustomized.yaml
+kubectl --namespace $TARGET_ENV describe -f ${KUSTOMIZE_FILE_NAME}
 
 echo "=========================================================="
 echo "Updated Pods:"
