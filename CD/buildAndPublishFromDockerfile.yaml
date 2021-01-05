@@ -1,0 +1,37 @@
+name: 'Build and publish from Dockerfile'
+inputs:
+  service_account_key:
+    description: 'Service account key'
+    required: true
+  project_id:
+    description: 'Project id'
+    required: true
+  docker_image_name:
+    description: 'Docker image name'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Export DOCKER_TAG
+      run: |
+        echo "DOCKER_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ inputs.project_id }}
+        service_account_key: ${{ inputs.service_account_key }}
+        export_default_credentials: true
+
+    - name: Register gcloud as a Docker credential helper
+      run: |
+        gcloud --quiet auth configure-docker
+
+    - name: Build Docker image
+      run: |
+        docker build . --tag ${{ inputs.docker_image_name }}:${{ env.DOCKER_TAG }}
+
+    - name: Publish the Docker image to Google Container Registry
+      run: |
+        docker push ${{ inputs.docker_image_name }}:${{ env.DOCKER_TAG }}
