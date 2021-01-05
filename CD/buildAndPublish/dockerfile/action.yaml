@@ -14,6 +14,7 @@ runs:
   using: 'composite'
   steps:
     - name: Export DOCKER_TAG
+      shell: bash
       run: |
         echo "DOCKER_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
@@ -25,13 +26,16 @@ runs:
         export_default_credentials: true
 
     - name: Register gcloud as a Docker credential helper
+      shell: bash
       run: |
         gcloud --quiet auth configure-docker
 
     - name: Build Docker image
+      shell: bash
       run: |
         docker build . --tag ${{ inputs.docker_image_name }}:${{ env.DOCKER_TAG }}
 
     - name: Publish the Docker image to Google Container Registry
+      shell: bash
       run: |
         docker push ${{ inputs.docker_image_name }}:${{ env.DOCKER_TAG }}

@@ -30,10 +30,12 @@ runs:
         credentials: ${{ inputs.credentials }}"
 
     - name: Deploy kustomize dir ${{ inputs.k8s_dir }} (dry-run)
+      shell: bash
       if: github.event_name == 'pull_request'
       run: |
         kustomize build ${{ inputs.kustomize_dir }} | kubectl apply --dry-run=client -f -
     - name: Deploy kustomize dir ${{ inputs.k8s_dir }}
+      shell: bash
       if: github.event_name != 'pull_request'
       run: |
         kustomize build ${{ inputs.kustomize_dir }} | kubectl apply -f -
