@@ -40,12 +40,12 @@ runs:
 #        kustomize edit set image image=${{ inputs.docker_image_name }}:${{ env.DOCKER_TAG }}
 #        cd "$GITHUB_WORKSPACE"
 
-    - name: Deploy ${{ inputs.k8s_dir }} dry-run
+    - name: Deploy k8s dir ${{ inputs.k8s_dir }} (dry-run)
       if: github.event_name == 'pull_request'
       run: |
         kubectl apply --dry-run=client -f ${{ inputs.k8s_dir }}
 #        kustomize build ${{ inputs.kustomize_dir }} | kubectl apply --dry-run=client -f -
-    - name: Deploy ${{ inputs.k8s_dir }}
+    - name: Deploy k8s dir ${{ inputs.k8s_dir }}
       if: github.event_name != 'pull_request'
       run: |
         kubectl apply -f ${{ inputs.k8s_dir }}

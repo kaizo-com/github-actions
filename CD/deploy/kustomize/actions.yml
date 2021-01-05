@@ -1,0 +1,39 @@
+name: Deploy to k8s
+inputs:
+  cluster_name:
+    description: 'Cluster name'
+    required: true
+  project_id:
+    description: 'Project id'
+    required: true
+  location:
+    description: 'Location'
+    required: true
+  credentials:
+    description: 'Credentials'
+    required: true
+  kustomize_dir:
+    description: 'Kustomize directory'
+    required: true
+
+
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup authentication to GKE cluster
+      uses: google-github-actions/get-gke-credentials@main
+      with:
+        cluster_name: ${{ inputs.cluster_name }}
+        project_id: ${{ inputs.project_id }}
+        location: ${{ inputs.location }}
+        credentials: ${{ inputs.credentials }}"
+
+    - name: Deploy kustomize dir ${{ inputs.k8s_dir }} (dry-run)
+      if: github.event_name == 'pull_request'
+      run: |
+        kustomize build ${{ inputs.kustomize_dir }} | kubectl apply --dry-run=client -f -
+    - name: Deploy kustomize dir ${{ inputs.k8s_dir }}
+      if: github.event_name != 'pull_request'
+      run: |
+        kustomize build ${{ inputs.kustomize_dir }} | kubectl apply -f -
