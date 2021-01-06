@@ -13,10 +13,8 @@ inputs:
 #    description: 'Credentials'
 #    required: true
   resources_dir:
-    description: 'Kubernetes resources directory'
+    description: 'Kustomize resources directory'
     required: true
-
-
 
 runs:
   using: 'composite'
@@ -29,11 +27,9 @@ runs:
 #        project_id: ${{ inputs.project_id }}
 #        location: ${{ inputs.location }}
 #        credentials: ${{ inputs.credentials }}
-    - name: Deploy k8s dir ${{ inputs.k8s_dir }} (dry-run)
-      if: github.event_name == 'pull_request'
+    - name: Deploy kustomize dir ${{ inputs.resources_dir }} (dry-run)
+      shell: bash
+# Conditionals are not yet supported: https://github.com/actions/runner/issues/646
+#      if: github.event_name == 'pull_request'
       run: |
-        kubectl apply --dry-run=client -f ${{ inputs.k8s_dir }}
-    - name: Deploy k8s dir ${{ inputs.k8s_dir }}
-      if: github.event_name != 'pull_request'
-      run: |
-        kubectl apply -f ${{ inputs.k8s_dir }}
+        kustomize build ${{ inputs.resources_dir }} | kubectl apply --dry-run=client -f -
