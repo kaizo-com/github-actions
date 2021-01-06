@@ -1,19 +1,19 @@
 name: Deploy to k8s
 inputs:
-  cluster_name:
-    description: 'Cluster name'
-    required: true
-  project_id:
-    description: 'Project id'
-    required: true
-  location:
-    description: 'Location'
-    required: true
-  credentials:
-    description: 'Credentials'
-    required: true
-  k8s_dir:
-    description: 'Kubernetes directory'
+#  cluster_name:
+#    description: 'Cluster name'
+#    required: true
+#  project_id:
+#    description: 'Project id'
+#    required: true
+#  location:
+#    description: 'Location'
+#    required: true
+#  credentials:
+#    description: 'Credentials'
+#    required: true
+  resources_dir:
+    description: 'Kubernetes resources directory'
     required: true
 
 
@@ -21,30 +21,18 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Setup authentication to GKE cluster
-      uses: google-github-actions/get-gke-credentials@main
-      with:
-        cluster_name: ${{ inputs.cluster_name }}
-        project_id: ${{ inputs.project_id }}
-        location: ${{ inputs.location }}
-        credentials: ${{ inputs.credentials }}
-
-#    - name: Export DOCKER_TAG
-#      run: |
-#        echo "DOCKER_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
-#
-#    - name: Set docker image
-#      run: |
-#        cd ${{ inputs.kustomize_dir }}
-#
-#        kustomize edit set image image=${{ inputs.docker_image_name }}:${{ env.DOCKER_TAG }}
-#        cd "$GITHUB_WORKSPACE"
-
+# Cannot compose actions with another (yet): https://github.com/actions/runner/issues/438
+#    - name: Setup authentication to GKE cluster
+#      uses: google-github-actions/get-gke-credentials@main
+#      with:
+#        cluster_name: ${{ inputs.cluster_name }}
+#        project_id: ${{ inputs.project_id }}
+#        location: ${{ inputs.location }}
+#        credentials: ${{ inputs.credentials }}
     - name: Deploy k8s dir ${{ inputs.k8s_dir }} (dry-run)
       if: github.event_name == 'pull_request'
       run: |
         kubectl apply --dry-run=client -f ${{ inputs.k8s_dir }}
-#        kustomize build ${{ inputs.kustomize_dir }} | kubectl apply --dry-run=client -f -
     - name: Deploy k8s dir ${{ inputs.k8s_dir }}
       if: github.event_name != 'pull_request'
       run: |
