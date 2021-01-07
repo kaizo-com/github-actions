@@ -1,17 +1,5 @@
 name: Deploy to k8s
 inputs:
-#  cluster_name:
-#    description: 'Cluster name'
-#    required: true
-#  project_id:
-#    description: 'Project id'
-#    required: true
-#  location:
-#    description: 'Location'
-#    required: true
-#  credentials:
-#    description: 'Credentials'
-#    required: true
   resources_dir:
     description: 'Kustomize resources directory'
     required: true
@@ -19,17 +7,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-# Cannot compose actions with another (yet): https://github.com/actions/runner/issues/438
-#    - name: Setup authentication to GKE cluster
-#      uses: google-github-actions/get-gke-credentials@main
-#      with:
-#        cluster_name: ${{ inputs.cluster_name }}
-#        project_id: ${{ inputs.project_id }}
-#        location: ${{ inputs.location }}
-#        credentials: ${{ inputs.credentials }}
     - name: Deploy kustomize dir ${{ inputs.resources_dir }} (dry-run)
       shell: bash
-# Conditionals are not yet supported: https://github.com/actions/runner/issues/646
-#      if: github.event_name == 'pull_request'
       run: |
         kustomize build ${{ inputs.resources_dir }} | kubectl apply --dry-run=client -f -
